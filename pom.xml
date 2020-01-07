@@ -22,10 +22,9 @@
     </dependencies>
 
     <properties>
-        <java.version>1.8</java.version>
-        <javac.version>9+181-r4173-1</javac.version>
+        <java.version>11</java.version>
         <errorprone.version>2.3.3</errorprone.version>
-        <auto-value.version>1.6.5</auto-value.version>
+        <auto-value.version>1.7</auto-value.version>
         <nullaway.version>0.7.2</nullaway.version>
     </properties>
 
@@ -43,20 +42,26 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <compilerId>javac-with-errorprone</compilerId>
+                    <release>${java.version}</release>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <showWarnings>true</showWarnings>
                     <fork>true</fork>
                     <compilerArgs>
                         <arg>-Xlint:unchecked</arg>
                         <arg>-XDcompilePolicy=byfile</arg>
-                        <arg>-Xep:NullAway:WARN</arg>
-                        <arg>-XepOpt:NullAway:AnnotatedPackages=com.github.jonfreedman</arg>
-                        <arg>-XepDisableWarningsInGeneratedCode</arg>
+                        <!-- There is a bug in error prone plugin, and it doesnt accept the -Xep arguments if the are in separate <arg> tags -->
+                        <arg>-Xplugin:ErrorProne <!--
+                         --> -Xep:NullAway:WARN <!--
+                         --> -XepOpt:NullAway:AnnotatedPackages=com.github.jonfreedman <!--
+                         --> -XepDisableWarningsInGeneratedCode
+                        </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${errorprone.version}</version>
+                        </path>
                         <path>
                             <groupId>com.google.auto.value</groupId>
                             <artifactId>auto-value</artifactId>
@@ -71,44 +76,8 @@
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.plexus</groupId>
-                        <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                        <version>2.8.5</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.google.errorprone</groupId>
-                        <artifactId>error_prone_core</artifactId>
-                        <version>${errorprone.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>jdk8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <inherited>true</inherited>
-                        <configuration>
-                            <compilerArgs combine.children="append">
-                                <arg>
-                                    -J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${javac.version}/javac-${javac.version}.jar
-                                </arg>
-                            </compilerArgs>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>
