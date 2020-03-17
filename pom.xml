@@ -23,9 +23,9 @@
 
     <properties>
         <java.version>11</java.version>
-        <errorprone.version>2.3.3</errorprone.version>
+        <errorprone.version>2.3.4</errorprone.version>
         <auto-value.version>1.7</auto-value.version>
-        <nullaway.version>0.7.2</nullaway.version>
+        <nullaway.version>0.7.9</nullaway.version>
     </properties>
 
     <build>
